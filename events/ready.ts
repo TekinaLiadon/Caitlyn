@@ -4,6 +4,7 @@ import { discordLogger } from "../utils/logger";
 import SlashCommand from "../structures/Command";
 import { RESTPostAPIApplicationCommandsJSONBody } from "discord-api-types/v10";
 import { ApplicationCommandData, SlashCommandBuilder } from "discord.js";
+import statusUpdate from "../utils/statusUpdate";
 
 const truthyFilter = <T>(x: T | false | undefined | "" | 0): x is T => !!x;
 // interface ClientEvents
@@ -17,6 +18,8 @@ export default class ReadyEvent extends Event {
     discordLogger.info(
       `📊 Находится на ${client?.guilds.cache.size} серверах.`
     );
+
+    statusUpdate()
 
     if (["deploy", "register", "edit"].includes(process.argv[2])) {
       discordLogger.debug(`Fetching application...`);
