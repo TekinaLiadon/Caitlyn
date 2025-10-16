@@ -11,10 +11,12 @@
   "author": "Tekina",
   "license": "ISC",
   "dependencies": {
+    "@elysiajs/static": "^1.4.4",
     "bunyan": "^1.8.15",
     "bunyan-format": "^0.2.1",
     "discord-api-types": "^0.37.54",
-    "discord.js": "^14.13.0"
+    "discord.js": "^14.13.0",
+    "elysia": "^1.4.12"
   },
   "devDependencies": {
     "bun-types": "latest"

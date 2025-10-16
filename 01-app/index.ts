@@ -1,7 +1,6 @@
 import Discord from "discord.js";
 import fs from "fs";
 import path from "path";
-
 export const client = new Discord.Client({
   allowedMentions: { parse: ["users", "roles"] },
   intents: [
@@ -25,6 +24,9 @@ import { discordLogger } from "../utils/logger";
 discordLogger.info("Началась загрузка событий...");
 import Event from "../structures/Event";
 import Command from "../structures/Command";
+import Elysia, {file} from "elysia";
+import staticPlugin from "@elysiajs/static";
+import router from "../02-plugins/router";
 export const commands = new Discord.Collection<string, Command>();
 const start = async () => {
   const eventsLoading = await (async function loadEvents(
@@ -77,4 +79,14 @@ const start = async () => {
     });
 };
 
-start();
+(async () => {
+  await start()
+  const app = new Elysia()
+      .use(staticPlugin())
+      .get('/', () => file('./public/index.html'))
+      .use(router)
+      .listen(7009)
+  console.log(`🦊 Caitlyn is running at ${app.server?.hostname}:${app.server?.port}`);
+})()
+
+

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновление модов</title>
+    <style>
+        :root {
+            --background-color: #39495e;
+            --form-background: #4A5A6E;
+            --text-color: #ECEFF1;
+            --border-color: #546E7A;
+            --accent-color: #ffc107;
+            --accent-hover: #ffca28;
+            --input-background: #546E7A;
+            --disabled-color: #9E9E9E;
+            --success-color: #66BB6A;
+            --error-color: #EF5350;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+            Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .update-form-container {
+            background-color: var(--form-background);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .update-form h2 {
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-background);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+        }
+
+        .form-input[type="file"] {
+            padding: 8px;
+        }
+
+        .form-input[type="file"]::file-selector-button {
+            margin-right: 10px;
+            border: none;
+            background: var(--accent-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            color: #212121;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .form-input[type="file"]::file-selector-button:hover {
+            background: var(--accent-hover);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--accent-color);
+            color: #212121;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--border-color);
+            color: var(--disabled-color);
+            cursor: not-allowed;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--form-background);
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 300px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 25px;
+        }
+
+        .modal-close-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+            min-width: 100px;
+        }
+
+        .modal-content.success .modal-close-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .modal-content.error .modal-close-btn {
+            background-color: var(--error-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="update-form-container">
+    <form id="updateForm" class="update-form">
+        <h2>Панель управления</h2>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" class="form-input" required>
+        </div>
+        <div class="form-group">
+            <label for="modsFile">Файл разрешений (.txt)</label>
+            <input type="file" id="modsFile" name="modsFile" class="form-input" accept=".txt" required>
+        </div>
+        <button type="submit" id="submitButton" class="submit-btn">Отправить</button>
+    </form>
+</div>
+
+<div id="responseModal" class="modal-overlay">
+    <div id="modalContent" class="modal-content">
+        <h3 id="modalTitle"></h3>
+        <p id="modalMessage"></p>
+        <button id="modalCloseBtn" class="modal-close-btn">Закрыть</button>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('updateForm');
+    const submitButton = document.getElementById('submitButton');
+    const modalOverlay = document.getElementById('responseModal');
+    const modalContent = document.getElementById('modalContent');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    const showModal = (title, message, isSuccess) => {
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modalContent.classList.remove('success', 'error');
+        modalContent.classList.add(isSuccess ? 'success' : 'error');
+        modalOverlay.classList.add('visible');
+    };
+
+    const hideModal = () => {
+        modalOverlay.classList.remove('visible');
+    };
+
+    modalCloseBtn.addEventListener('click', hideModal);
+    modalOverlay.addEventListener('click', (event) => {
+        if (event.target === modalOverlay) {
+            hideModal();
+        }
+    });
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Отправка...';
+
+        const formData = new FormData(form);
+
+        fetch('/api/updateMods', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    showModal('Успех!', 'Обновление прошло успешно.', true);
+                    form.reset();
+                } else {
+                    showModal('Ошибка!', 'Не удалось выполнить обновление. Сервер вернул ошибку.', false);
+                }
+            })
+            .catch(error => {
+                console.error('Произошла ошибка:', error);
+                showModal('Ошибка!', 'Сетевая ошибка. Не удалось отправить запрос.', false);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Отправить';
+            });
+    });
+</script>
+
+</body>
+</html>
